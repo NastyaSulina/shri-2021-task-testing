@@ -1,6 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import {render,} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import {CartApi} from "../../src/client/api";
 import {initStore} from "../../src/client/store";
 import {BrowserRouter} from "react-router-dom";
@@ -30,7 +30,16 @@ describe('Каталог', () => {
             </BrowserRouter>
         );
     })
+    it('В каталоге должны отображаться товары, список которых приходит с сервера', async () => {
+        render(catalog);
+        const products = await api.getAllProducts();
 
+        await screen.findAllByTestId(0)
+
+        for (const product of products.data) {
+            expect(screen.queryByTestId(`${product.id}`)).toBeInTheDocument();
+        }
+    })
     it('На странице с подробной информацией отображаются: название товара, его описание, цена, цвет, материал и кнопка "добавить в корзину"', async () => {
         const product = await api.getProductById(0);
         const productDetails = (
