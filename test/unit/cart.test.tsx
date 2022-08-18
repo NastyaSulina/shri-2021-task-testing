@@ -37,21 +37,21 @@ describe('Корзина',  () => {
         );
     })
 
+    afterEach(() => {
+        store.dispatch(clearCart());
+    })
+
     it('В корзине должна отображаться таблица с добавленными в нее товарами', async () => {
         const {container} = render(cartApplication);
         await addProductToCard(0);
 
         expect(container.querySelector('.Cart-Table')).toBeInTheDocument();
         expect(screen.getAllByTestId(0)[0]).toBeInTheDocument();
-
-        store.dispatch(clearCart());
     })
 
     it('Если корзина пустая, должна отображаться ссылка на каталог товаров', async () => {
         render(cartApplication);
         expect(screen.getByRole('link', {name: /catalog/i})).toHaveAttribute('href', '/hw/store/catalog')
-
-        store.dispatch(clearCart());
     })
 
     it('Для каждого товара должны отображаться название, цена, количество , стоимость, а также должна отображаться общая сумма заказа', async () => {
@@ -71,8 +71,6 @@ describe('Корзина',  () => {
             orderPrice += cartState[item].price * cartState[item].count;
         }
         expect(container.querySelector('.Cart-OrderPrice')).toHaveTextContent(`${orderPrice}`);
-
-        store.dispatch(clearCart());
     })
 
     it('В корзине должна быть кнопка "очистить корзину", по нажатию на которую все товары должны удаляться', async () => {
@@ -84,8 +82,6 @@ describe('Корзина',  () => {
 
         await userEvent.click(screen.getByRole('button', {name: /clear shopping cart/i}));
         expect(Object.entries(store.getState().cart).length === 0).toBeTruthy();
-
-        store.dispatch(clearCart());
     })
 
     it('в шапке рядом со ссылкой на корзину должно отображаться количество не повторяющихся товаров в ней', async () => {
@@ -97,6 +93,7 @@ describe('Корзина',  () => {
             </BrowserRouter>
         );
         render(application);
+
         Promise.all([ addProductToCard(0),  addProductToCard(0), addProductToCard(0), addProductToCard(1)]).then(() => {
             let count: number = Object.keys(store.getState().cart).length;
             expect(count).toBe(2)

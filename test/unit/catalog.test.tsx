@@ -16,30 +16,13 @@ describe('Каталог', () => {
     let api: MockProduct;
     let cart: CartApi;
     let store: Store;
-    let catalog: JSX.Element;
 
     beforeAll(() => {
         api = new MockProduct(basename);
         cart = new CartApi();
         store = initStore(api, cart);
-        catalog = (
-            <BrowserRouter basename={basename}>
-                <Provider store={store}>
-                    <Catalog/>
-                </Provider>
-            </BrowserRouter>
-        );
     })
-    it('В каталоге должны отображаться товары, список которых приходит с сервера', async () => {
-        render(catalog);
-        const products = await api.getAllProducts();
 
-        await screen.findAllByTestId(0)
-
-        for (const product of products.data) {
-            expect(screen.queryByTestId(`${product.id}`)).toBeInTheDocument();
-        }
-    })
     it('На странице с подробной информацией отображаются: название товара, его описание, цена, цвет, материал и кнопка "добавить в корзину"', async () => {
         const product = await api.getProductById(0);
         const productDetails = (
@@ -58,4 +41,22 @@ describe('Каталог', () => {
         expect(container.querySelector('.ProductDetails-Material')).toHaveTextContent(product.data.material);
         expect(container.querySelector('.ProductDetails-AddToCart')).toBeInTheDocument();
     })
+
+    // it('В каталоге должны отображаться товары, список которых приходит с сервера', async () => {
+    //     catalog = (
+    //         <BrowserRouter basename={basename}>
+    //             <Provider store={store}>
+    //                 <Catalog/>
+    //             </Provider>
+    //         </BrowserRouter>
+    //     );
+    //     render(catalog);
+    //     const products = await api.getAllProducts();
+    //
+    //     await screen.findAllByTestId(0)
+    //
+    //     for (const product of products.data) {
+    //         expect(screen.queryByTestId(`${product.id}`)).toBeInTheDocument();
+    //     }
+    // })
 });
